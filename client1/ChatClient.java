@@ -45,7 +45,6 @@ public class ChatClient {
 		socket = new Socket("localhost", Env.getPort());
 		dis = new DataInputStream(socket.getInputStream());
 		dos = new DataOutputStream(socket.getOutputStream());
-		System.out.println("[클라이언트] 서버에 연결됨");
 	}
 	
 	//메소드: JSON 받기
@@ -265,11 +264,9 @@ public class ChatClient {
 		}
 	}
 	
-	public void logout(Scanner scanner) {
-        //로그인 멤버 전역 객체에 초기화  
+	public void logout(Scanner scanner) { 
         loginMember = null;
-        
-        //메뉴 모드를 설정한다
+
         menuMode = MenuMode.NOT_LOGIN_MENU;
 	    
 	}
@@ -281,23 +278,16 @@ public class ChatClient {
 	    try {
 			memberRepository.detail(member);
 		} catch (NotExistUidPwd e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	    
 	}
 	
     private void updateMember(Scanner scanner) {
-        String uid;
-        String pwd;
-        String name;
-        String sex;
-        String address;
-        String phone;
         MemberRepositoryDB memberRepository = new MemberRepositoryDB();
         Member member=loginMember;
         try {
-           memberRepository.updateTest(member);
+           memberRepository.updateUser(member);
            
         } catch (Exception e) {
             e.printStackTrace();
@@ -419,7 +409,6 @@ public class ChatClient {
             }
 
             roomName = getRoomName(roomNum);
-            //roomName = chatRooms.get(roomNum-1);
             
             enterRoom(scanner);
             
@@ -460,7 +449,6 @@ public class ChatClient {
     }
 
     private void enterRoomResponse() throws IOException {
-        //메시지 수신을 위한 스레드 구동 
         receive();
             
     }
@@ -472,7 +460,7 @@ public class ChatClient {
       System.out.println("--------------------------------------------------");
       System.out.println("보낼 메시지를 입력하고 Enter");
       System.out.println("채팅를 종료하려면 q를 입력하고 Enter");
-      System.out.println("채팅방에 참여자 목록(@userlist), 귀속말(@아이디), 첨부파일 업로드(@up:파일명), 첨부파일목록 요청(@filelist), 첨부파일 다운로드(@download:파일명), 첨부파일 업로드 또는 다운로드중 취소 (@cancel)");
+      System.out.println("참여자 목록(@userlist), 귓속말(/아이디), 파일업로드(@up:파일경로), 파일목록(@filelist), 파일다운로드(@down:파일명)");
       System.out.println("--------------------------------------------------");
       JSONObject jsonObject = new JSONObject();
       while(true) {
@@ -491,28 +479,26 @@ public class ChatClient {
 
                   new Thread(()->{
                       try {
-                          //전송할 파일의 내용을 읽는다 
                           BufferedInputStream in = new BufferedInputStream(new FileInputStream(file));
                           byte [] data = new byte[(int)file.length()];
                           in.read(data);
                           in.close();
 
-                          //전송할 메시지를 구성한다  
                           jsonObject.put("command", "fileUpload");
                           jsonObject.put("roomName", roomName);
                           jsonObject.put("fileName", file.getName());
                           jsonObject.put("content", new String(Base64.getEncoder().encode(data)));
                           
                           String json = jsonObject.toString();
-                          //서버에 연결 
+
                           Socket socket = new Socket("localhost", Env.getPort());
                           DataInputStream dis = new DataInputStream(socket.getInputStream());
                           DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
 
                           byte [] sendData = json.getBytes("UTF8");
-                          //서버에 첨부파일 전송 
-                          dos.writeInt(sendData.length);//문자열의 길이(4byte)
-                          //
+
+                          dos.writeInt(sendData.length);
+                          
                           int remainder = sendData.length;
                           int sendBlock = remainder > 4069 ? 4069 : remainder;
                           int pos = 0;
@@ -523,13 +509,12 @@ public class ChatClient {
                               if (remainder < sendBlock) {
                                   sendBlock = remainder;
                               }
-                              System.out.println("length = " + sendData.length + "      pos = " + pos + "   sendBlock = " + sendBlock);
+                             
                           }
-                          System.out.println("모든 자료 전송");
+                          System.out.println("전송완료");
 
                           dos.flush();
 
-                          //서버에서 결과 수신 
                           int length = dis.readInt();
                           pos = 0; 
                           byte [] recvData = new byte[length];
@@ -542,10 +527,7 @@ public class ChatClient {
                           JSONObject root = new JSONObject(responseJson);
                           String statusCode = root.getString("statusCode");
                           
-                          //서버의 처리 결과를 출력한다 
                           System.out.println(root.getString("message"));
-                          
-                          //서버와 연결을 끊는다
                           socket.close();
 
                       } catch (Exception e) {
@@ -553,8 +535,8 @@ public class ChatClient {
                       }
                   }).start();
               }
-          } else if(message.startsWith("@download:")) {
-              String fileName = message.substring("@download:".length());
+          } else if(message.startsWith("@down:")) {
+              String fileName = message.substring("@down:".length());
                   
               new Thread(()->{
                   try {
@@ -587,21 +569,19 @@ public class ChatClient {
                       String responseJson = new String(recvData, "UTF8");
                       JSONObject root = new JSONObject(responseJson);
                       String statusCode = root.getString("statusCode");
-                      
-                      //서버와 연결을 끊는다
+               
                       socket.close();
 
                       if ("0".equals(statusCode)) {
-                          //서버에 받은 정보를 기준으로 파일 저장을 한다 
                           byte [] data = Base64.getDecoder().decode(root.getString("content").getBytes());
-    
-                          System.out.println("WorkPath : " + Env.getWorkPath());
                           File workPath = new File(Env.getWorkPath());
                           if (!workPath.exists()) {
                               workPath.mkdirs();
                           }
                                   
                           File file = new File(workPath, fileName);
+                          
+                     
                           try {
                               System.out.println("저장위치 : " + file.getAbsolutePath());
                               BufferedOutputStream fos = new BufferedOutputStream(new FileOutputStream(file));
@@ -610,6 +590,12 @@ public class ChatClient {
                           } catch (IOException e) {
                               e.printStackTrace();
                           }
+                          if (fileName.contains("jpg") || fileName.contains("png") || fileName.contains("jpeg")) {
+        					Runtime.getRuntime().exec("mspaint "+ file.getAbsolutePath());
+       				} else if (fileName.contains("txt")) {
+        					Runtime.getRuntime().exec("notepad "+ file.getAbsolutePath());
+       				}
+       
                           System.out.println("파일 다운로드 완료");
                       } else {
                           System.out.println(root.getString("message"));
@@ -619,9 +605,7 @@ public class ChatClient {
                       e.printStackTrace();
                   }
               }).start();
-          } else if(message.startsWith("@cancel")) {
-              sendRecvStop = true;
-          } else {
+          }else {
               jsonObject.put("command", "message");
               jsonObject.put("roomName", roomName);
               jsonObject.put("data", message);
@@ -648,13 +632,13 @@ public class ChatClient {
                     login(scanner);
                     break;
                 case "2":
-                	memberRepository.insertTest(scanner);
+                	memberRepository.insertUser(scanner);
                     break;
                 case "3":
                 	memberRepository.findPwd();
                     break;
                 case "4":
-                	memberRepository.deleteTest(scanner);
+                	memberRepository.deleteUser(scanner);
                 	break;
                 case "5":
                 	memberRepository.adminLogin();
@@ -746,17 +730,16 @@ public class ChatClient {
     private void displayChattingRoomList() {
         int idx = 1;
         System.out.println("----------------");
-        System.out.println("* 채팅방 목록 *");
+        System.out.println("* 입장가능한 채팅방 *");
         for (String chatRoom : chatRooms) {
             System.out.println(idx + ". " + chatRoom);
             idx++;
         }
         if (0 == chatRooms.size()) {
-            System.out.println("* 입장 가능한 채팅방이 없습니다. 채팅방 생성을 먼저 생성하세요 *");
+            System.out.println("* 입장 가능한 채팅방이 없습니다. 채팅방 생성을 먼저 해주세요 *");
         }        
     }
 
-	//메소드: 메인
 	public static void main(String[] args) {		
 		try {			
 			new ChatClient().mainMenu();

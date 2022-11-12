@@ -1,42 +1,27 @@
 package server1;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.sql.CallableStatement;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
-import java.util.stream.Collectors;
-
 import client1.ChatClient;
 import member.Member;
 import member.Member.ExistMember;
 import member.Member.NotExistUidPwd;
-import server1.MemberRepositoryDB;
-import server1.Env;
+
+
 
 public class MemberRepositoryDB implements MemberRepository{
-//	List<Member> memberList = null;
-//	Map<String, Member> memberMap = null;
+
 	Connection conn = null;
 	PreparedStatement pstmt = null;
 
 	public void open() {
 		try {
-			Class.forName(Env.getProperty("driverClass"));
-			System.out.println("JDBC 드라이버 로딩 성공");
-			
+			Class.forName(Env.getProperty("driverClass"));		
 			conn = DriverManager.getConnection(Env.getProperty("dbServerConn")
 					, Env.getProperty("dbUser")
 					, Env.getProperty("dbPasswd"));
@@ -60,6 +45,7 @@ public class MemberRepositoryDB implements MemberRepository{
 		
 	}
 	
+
 	public synchronized void insertMember(Member member) throws Member.ExistMember {
 
 		try {
@@ -196,10 +182,6 @@ public class MemberRepositoryDB implements MemberRepository{
 		try {
 			open();
 
-			pstmt = conn.prepareStatement(Env.getProperty("SELECT_MEMBER"));
-
-			// 멤버 존재여부 확인
-			
 			pstmt = conn.prepareStatement(Env.getProperty("UPDATE_MEMBER"));
 
 			// 멤버 정보 설정
@@ -288,7 +270,7 @@ public class MemberRepositoryDB implements MemberRepository{
 			}
 			
 		}
-	public void insertTest(Scanner scanner) {
+	public void insertUser(Scanner scanner) {
 		String uid;
 		String pwd;
 		String name;
@@ -352,7 +334,7 @@ public class MemberRepositoryDB implements MemberRepository{
 		}
 	}
 
-	public void updateTest(Member member) {
+	public void updateUser(Member member) {
 		String uid;
 		String pwd;
 		String name;
@@ -383,7 +365,6 @@ public class MemberRepositoryDB implements MemberRepository{
 			member.setPhone(phone);
 			memberRepository.updateMember(member);
 		} catch (NotExistUidPwd e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		
@@ -391,7 +372,7 @@ public class MemberRepositoryDB implements MemberRepository{
 		
 	}
 
-	public void deleteTest(Scanner scanner) {
+	public void deleteUser(Scanner scanner) {
 		MemberRepositoryDB memberRepository = new MemberRepositoryDB();
 
 		Scanner sc = new Scanner(System.in);
@@ -522,7 +503,6 @@ public class MemberRepositoryDB implements MemberRepository{
 			int cnt = 0;
 			while (rs.next()) {
 				cnt += 1;
-				// System.out.println("-----------------------------------------------------------------------------");
 				System.out.print("# " + cnt + "\t");
 				System.out.print("아이디: " + rs.getString(1) + " ");
 				System.out.print("비밀번호: " + rs.getString(2) + " ");
@@ -530,13 +510,7 @@ public class MemberRepositoryDB implements MemberRepository{
 				System.out.print("전화번호: " + rs.getString(4) + " ");
 				System.out.print("성별: " + rs.getString(5) + " ");
 				System.out.print("주소: " + rs.getString(6) + " ");
-				String Exist=rs.getString(8);
-				if(Exist.equals("0")) {
-					System.out.print("탈퇴회원");
-				}
-				else {
-					System.out.print("가입회원");
-				}
+				System.out.print("가입날짜: " + rs.getString(7) + " ");
 				System.out.println();
 			}
 		} catch (Exception e) {
@@ -550,7 +524,6 @@ public class MemberRepositoryDB implements MemberRepository{
 	public void detail(Member member) throws NotExistUidPwd {
 		try {
 			open();
-			MemberRepositoryDB memberRepository = new MemberRepositoryDB();
 			pstmt = conn.prepareStatement(Env.getProperty("DETAIL_MEMBER"));
 			System.out.println("-------------------------------------");
 			System.out.println("	" + member.getName() + " 님의 회원정보");
@@ -579,16 +552,15 @@ public class MemberRepositoryDB implements MemberRepository{
 		}
 		return pwdLenth;
 	}
-
-	public static void main(String[] args) {
-
-		// updateTest();
-		// findByUidTest();
-	}
-
+	public static void main(String[] args) { 
+		 
+		// updateTest(); 
+		// findByUidTest(); 
+	} 
 	@Override
 	public void insertTest(Scanner scanner, Member member) throws ExistMember {
-
+		// TODO Auto-generated method stub
+		
 	}
 
 }

@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.SQLException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -20,7 +21,6 @@ import org.json.JSONObject;
 import member.Member;
 
 public class ChatServer {
-	//필드
 	ServerSocket serverSocket;
 	ExecutorService threadPool;
 	Map<String, Map<String, SocketClient>> chatRooms;
@@ -62,7 +62,6 @@ public class ChatServer {
             throw new ExistChatRootException();
         }
         chatRooms.put(socketClient.getRoomName(), new HashMap<>());
-        //폴더 생성 
         String path = Env.getWorkPath() + File.separatorChar + String.valueOf(socketClient.getRoomName().hashCode());
         File chatRoomFileFolder = new File(path);
         System.out.println(chatRoomFileFolder.getAbsolutePath());
@@ -71,8 +70,7 @@ public class ChatServer {
         }
         
     }
-	
-//	//메소드: 클라이언트 연결시 SocketClient 생성 및 추가
+
     public void addSocketClient(SocketClient socketClient) throws NotExistChatRootException  {
         if (!chatRooms.containsKey(socketClient.getRoomName())) {
             throw new NotExistChatRootException();
@@ -151,8 +149,8 @@ public class ChatServer {
             }
             sender.send(root.toString());    
 
-            //첨부파일 업로드(@download:파일명) 
-        } else if (message.startsWith("@download")) {
+            //첨부파일 업로드(@down:파일명) 
+        } else if (message.startsWith("@down")) {
             
         } else if (message.indexOf("/") == 0) { //귀속말 존재 여부 확인 
             int pos = message.indexOf(" ");
@@ -183,18 +181,18 @@ public class ChatServer {
 			serverSocket.close();
 			threadPool.shutdownNow();
 			chatRooms.values().stream().forEach(charRoom -> charRoom.values().stream().forEach(sc -> sc.close()));
+			
 			System.out.println( "[서버] 종료됨 ");
-		} catch (IOException e1) {}
+		} catch (IOException e) {}
 	}
 	
-	public synchronized void registerMember(Member member) throws Member.ExistMember {
-		memberRepository.insertMember(member);
-	}
-	
-	public synchronized Member findByUid(String uid) throws Member.NotExistUidPwd {
-		return memberRepository.findByUid(uid);
-	}
-	
+	public synchronized void registerMember(Member member) throws Member.ExistMember { 
+		memberRepository.insertMember(member); 
+	} 
+	 
+	public synchronized Member findByUid(String uid) throws Member.NotExistUidPwd { 
+		return memberRepository.findByUid(uid); 
+	} 
 	//메소드: 메인
 	public static void main(String[] args) {	
 		try {

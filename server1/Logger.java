@@ -1,21 +1,17 @@
 package server1;
 
 import java.io.BufferedOutputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.concurrent.LinkedBlockingQueue;
-
 import lombok.Data;
-import member.Member;
 
 enum CommandType {
 	NORMAL_CMD,
@@ -31,7 +27,7 @@ class Message {
 	private String roomName;
 	
 	private Message(CommandType commandType, String message, String roomName) {
-		this.commandType = commandType;
+		this.setCommandType(commandType);
 		this.message = message;
 		this.createDate = new Date(Calendar.getInstance().getTime().getTime());
 		this.roomName=roomName;
@@ -58,6 +54,14 @@ class Message {
 	}
 	public String getRoomName() {
 		return roomName;
+	}
+
+	public CommandType getCommandType() {
+		return commandType;
+	}
+
+	public void setCommandType(CommandType commandType) {
+		this.commandType = commandType;
 	}
 }
 
@@ -92,7 +96,6 @@ public class Logger implements Runnable {
         	  if (msg.getCommandType() == CommandType.EXIT_CMD) {
         		  break;
         	  }
-              //System.out.println(name + " : " + msg);
         	  out.println(msg.getMessageStr());
         	  if (this.dbWrite) {
 	        	  //DB에 기록
@@ -158,7 +161,6 @@ public class Logger implements Runnable {
 			pstmt.setDate(1, message.getCreateDate());
 			pstmt.setString(2, message.getMessage());
 			pstmt.setString(3, message.getRoomName());
-			pstmt.setString(4, message.getRoomName());
 			pstmt.executeUpdate();
 			conn.commit();
 			

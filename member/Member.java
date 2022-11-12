@@ -1,7 +1,6 @@
 package member;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.util.Objects;
 
 import org.json.JSONObject;
@@ -32,6 +31,62 @@ public class Member implements Serializable {
 		this.exist=exist;
 	}
 	
+	public String getUid() {
+		return uid;
+	}
+
+	public void setUid(String uid) {
+		this.uid = uid;
+	}
+
+	public String getPwd() {
+		return pwd;
+	}
+
+	public void setPwd(String pwd) {
+		this.pwd = pwd;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getSex() {
+		return sex;
+	}
+
+	public void setSex(String sex) {
+		this.sex = sex;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+	public String getPhone() {
+		return phone;
+	}
+
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+
+	public String getExist() {
+		return exist;
+	}
+
+	public void setExist(String exist) {
+		this.exist = exist;
+	}
+
 	public Member(JSONObject jsonObject) {
 		uid = jsonObject.getString("uid");
 		pwd = jsonObject.getString("pwd");

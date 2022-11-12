@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.time.LocalDateTime;
+import java.sql.SQLException;
 import java.util.Base64;
 import java.util.List;
 
@@ -72,15 +72,7 @@ public class SocketClient {
 					
 					JSONObject jsonObject = new JSONObject(receiveJson);
 					String command = jsonObject.getString("command");
-					
-					/*
-					입장 : incoming,이름
-					{command:incoming, data:'홍길동'}
-					
-					 채팅 : message,내용
-					{command:message, data:'안녕'}
-					
-					*/
+
 					switch(command) {
 						case "login":
 							login(jsonObject);
@@ -135,7 +127,18 @@ public class SocketClient {
                             download(jsonObject);
                             stop = true;
                             break;
-							
+//                        case "fileUpload":
+//    						fileUpload(jsonObject);
+//    						stop = true;
+//    						break;
+//    					case "fileListRequest":
+//    						fileListRequest(jsonObject);
+//    						stop = true;
+//    						break;
+//    					case "fileDownload":
+//    						fileDownload(jsonObject);
+//    						stop = true;
+//    						break;
 						case "message":
                             try {
                                 chatServer.sendToAll(this, jsonObject.getString("data"));
@@ -153,7 +156,7 @@ public class SocketClient {
                     close();
                 } catch (NotExistChatRootException e1) {
                     e1.printStackTrace();
-                }
+                } 
 			}
 		});
 	}
@@ -315,7 +318,7 @@ public class SocketClient {
 		jsonResult.put("message", "로그인 아이디가 존재하지 않습니다");
 		
 		try {
-			Member member = chatServer.findByUid(uid);
+			Member member = chatServer.findByUid(uid); 
 			if (null != member && pwd.equals(member.getPwd())) {
 			    
     				jsonResult.put("statusCode", "0");
@@ -354,8 +357,7 @@ public class SocketClient {
 		
 		close();
 	}
-	
-	//메소드: JSON 보내기
+
 	public void send(String json) {
 		try {
 	        byte [] data = json.getBytes("UTF8");
