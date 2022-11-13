@@ -75,7 +75,7 @@ public class MemberRepositoryDB implements MemberRepository{
 			pstmt.setString(5, member.getAddress());
 			pstmt.setString(6, member.getPhone());
 			pstmt.executeUpdate();
-
+			System.out.println("가입완료");
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println("------------- 실패 사유 : " + e.getMessage());
@@ -117,7 +117,7 @@ public class MemberRepositoryDB implements MemberRepository{
 	}
 //
 	public void searchLog(Scanner scanner) {
-		System.out.println("검색하고 싶은 유저이름을 입력하세요:");
+		System.out.println("검색하고 싶은 유저아이디를 입력하세요:");
 		String name = scanner.next();
 		findChatLog(name);
 		
@@ -402,7 +402,7 @@ public class MemberRepositoryDB implements MemberRepository{
 		try {
 			open();
 
-			pstmt = conn.prepareStatement(Env.getProperty("EXIST_MEMBER"));
+			pstmt = conn.prepareStatement(Env.getProperty("SELECT_MEMBER"));
 
 			// 멤버 존재여부 확인
 			pstmt.setString(1, member.getUid());

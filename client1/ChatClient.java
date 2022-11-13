@@ -156,7 +156,7 @@ public class ChatClient {
 		String message = root.getString("message");
 		
 		if (statusCode.equals("0")) {
-			System.out.println("로그인 성공");
+
 	        menuMode = MenuMode.LOGIN_MENU;
 
 		} else {
@@ -460,7 +460,7 @@ public class ChatClient {
       System.out.println("--------------------------------------------------");
       System.out.println("보낼 메시지를 입력하고 Enter");
       System.out.println("채팅를 종료하려면 q를 입력하고 Enter");
-      System.out.println("참여자 목록(@userlist), 귓속말(/아이디), 파일업로드(@up:파일경로), 파일목록(@filelist), 파일다운로드(@down:파일명)");
+      System.out.println("참여자 목록(@userlist), 귓속말(@아이디), 파일업로드(@up:파일경로), 파일목록(@filelist), 파일다운로드(@down:파일명)");
       System.out.println("--------------------------------------------------");
       JSONObject jsonObject = new JSONObject();
       while(true) {

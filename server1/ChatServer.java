@@ -152,15 +152,18 @@ public class ChatServer {
             //첨부파일 업로드(@down:파일명) 
         } else if (message.startsWith("@down")) {
             
-        } else if (message.indexOf("/") == 0) { //귀속말 존재 여부 확인 
-            int pos = message.indexOf(" ");
-            String key = message.substring(1, pos);
-            message = "(귓)" + message.substring(pos+1);
+        } else if (message.indexOf("@") == 0) { //귀속말 존재 여부 확인 
+        	 int pos = message.indexOf(" ");
+             String key = message.substring(1, pos);
+             message = "(귓)" + message.substring(pos+1);
+             root.put("clientIp", sender.clientIp);
+             root.put("chatName", sender.uid);
+             root.put("message", message);
+             SocketClient targetClient = chatRoom.get(key);
+             if (null != targetClient) {
+                 targetClient.send(root.toString());    
+             }
             
-            SocketClient targetClient = chatRoom.get(key);
-            if (null != targetClient) {
-                targetClient.send(root.toString());    
-            }
             
         } else {
             //체팅방에 있은 모든 사람(본인제외) 
