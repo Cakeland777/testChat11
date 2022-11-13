@@ -127,18 +127,7 @@ public class SocketClient {
                             download(jsonObject);
                             stop = true;
                             break;
-//                        case "fileUpload":
-//    						fileUpload(jsonObject);
-//    						stop = true;
-//    						break;
-//    					case "fileListRequest":
-//    						fileListRequest(jsonObject);
-//    						stop = true;
-//    						break;
-//    					case "fileDownload":
-//    						fileDownload(jsonObject);
-//    						stop = true;
-//    						break;
+
 						case "message":
                             try {
                                 chatServer.sendToAll(this, jsonObject.getString("data"));
